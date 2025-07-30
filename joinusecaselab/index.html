@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Use Case Lab — Request to Join</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f4f7fa; color: #2d3c4d;}
+    .form-container { background: #fff; padding: 2em; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 2px 8px #0001;}
+    label { display: block; margin-top: 1.2em;}
+    input[type="checkbox"] { margin-right: 0.6em;}
+    input[type="email"], button { width: 100%; padding: 0.7em; margin-top: 0.5em; border-radius: 6px; border: 1px solid #ddd;}
+    button { background: #003366; color: #fff; font-weight: bold; cursor: pointer;}
+    button:disabled { opacity: 0.5;}
+    .success { color: #197d4d; margin-top: 1em;}
+    .error { color: #d33; margin-top: 1em;}
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Request to Join Use Case Lab</h2>
+    <form id="requestForm" autocomplete="on">
+      <label>
+        <input type="checkbox" name="add_teams"> Add me to the Teams site
+      </label>
+      <label>
+        <input type="checkbox" name="invite_meeting"> Invite me to the weekly meeting
+      </label>
+      <label>
+        <input type="checkbox" name="invite_news"> Add me to the newsletter
+      </label>
+      <label>
+        Email address:
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <button type="submit">Submit Request</button>
+      <div id="formMessage"></div>
+    </form>
+  </div>
+
+  <!-- Supabase JS library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // TODO: Replace with your own Supabase project URL and anon key
+    const SUPABASE_URL = "https://cgsfmpkcewemokbegnnt.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2ZtcGtjZXdlbW9rYmVnbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MzMyNzIsImV4cCI6MjA2OTQwOTI3Mn0.-5paJnbUuFWoIRSVAYcx3LRPYH5_HRjwjYcupvRKYLc";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('requestForm');
+    const formMessage = document.getElementById('formMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formMessage.textContent = '';
+      formMessage.className = '';
+
+      const data = new FormData(form);
+      const email = data.get('email').trim();
+      const add_teams = data.get('add_teams') ? true : false;
+      const invite_meeting = data.get('invite_meeting') ? true : false;
+      const invite_news = data.get('invite_news') ? true : false;
+
+      if (!email) {
+        formMessage.textContent = "Please enter your email address.";
+        formMessage.className = "error";
+        return;
+      }
+
+      // Insert into Supabase
+      const { error } = await supabase
+        .from('Requests')
+        .insert([{
+          email,
+          add_teams,
+          invite_meeting,
+          invite_news
+        }]);
+
+      if (error) {
+        formMessage.textContent = "Sorry, there was an error. Please try again later.";
+        formMessage.className = "error";
+      } else {
+        formMessage.textContent = "Request submitted! Thank you for joining Use Case Lab.";
+        formMessage.className = "success";
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
