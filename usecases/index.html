@@ -181,11 +181,7 @@ function renderUseCaseList() {
 let filtered = useCases.filter(uc => {
   if (!filter) return true;
 
-  const tagList = Array.isArray(uc.tags)
-    ? uc.tags
-    : typeof uc.tags === "string"
-      ? uc.tags.split(',').map(t => t.trim())
-      : [];
+const tagList = parseTagsField(uc.tags);
 
   if (filter === '_UNTAGGED') {
     return tagList.length === 0;
@@ -295,11 +291,7 @@ if (tagErr) {
 
 let tagSet = new Set();
 (tagScan || []).forEach(uc => {
-  const tagList = Array.isArray(uc.tags)
-    ? uc.tags
-    : typeof uc.tags === 'string'
-      ? uc.tags.split(',').map(t => t.trim())
-      : [];
+const tagList = parseTagsField(uc.tags);
 
   tagList.forEach(tag => {
     if (tag) tagSet.add(tag);
