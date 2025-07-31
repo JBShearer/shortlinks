@@ -282,13 +282,19 @@ function renderTagDropdown() {
 // Load all tags and use cases (one call each)
 async function fetchTagsAndUseCases() {
   // Fetch tags from use_cases table
-  let { data: tagScan, error: tagErr } = await supabase.from('use_cases').select('tags');
-  tags = [];
-  if (tagScan) {
-    let tagSet = new Set();
-    tagScan.forEach(uc => (uc.tags || []).forEach(tag => tagSet.add(tag)));
-    tags = Array.from(tagSet).sort();
-  }
+let tagSet = new Set();
+tagScan.forEach(uc => {
+  const tagList = Array.isArray(uc.tags)
+    ? uc.tags
+    : typeof uc.tags === 'string'
+      ? uc.tags.split(',').map(t => t.trim())
+      : [];
+
+  tagList.forEach(tag => {
+    if (tag) tagSet.add(tag);
+  });
+});
+tags = Array.from(tagSet).sort();
 
   // ✅ THIS LINE IS CRITICAL – adds definition of ucRows
   let { data: ucRows, error: ucErr } = await supabase
