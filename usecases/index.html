@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Use Case List</title>
   <style>
     body {
@@ -12,14 +12,25 @@
     }
     .header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 24px 32px;
+      justify-content: space-between;
       background: #001a34;
       color: #fff;
+      padding: 20px 32px;
+      min-height: 56px;
+    }
+    .header-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .header-controls {
+      display: flex;
+      gap: 16px;
+      align-items: center;
     }
     .btn {
-      background-color: #0a6ed1;
+      background: #0a6ed1;
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -27,11 +38,29 @@
       font-size: 1rem;
       cursor: pointer;
       transition: background 0.2s;
+      font-family: inherit;
     }
     .btn:hover {
       background: #035c9e;
     }
-    /* Modal Styles */
+    .select {
+      padding: 7px 12px;
+      border-radius: 5px;
+      border: 1px solid #d1e0ee;
+      font-size: 1rem;
+      min-width: 140px;
+      font-family: inherit;
+    }
+    .main-content {
+      max-width: 900px;
+      margin: 36px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      padding: 32px 32px 60px 32px;
+      min-height: 380px;
+    }
+    /* Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -40,21 +69,28 @@
       top: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0,0,0,0.36);
       justify-content: center;
       align-items: center;
+      overflow: auto;
     }
     .modal.active {
       display: flex;
     }
     .modal-content {
       background: #fff;
-      padding: 32px 24px;
+      padding: 32px 28px 24px 28px;
       border-radius: 12px;
-      min-width: 320px;
-      max-width: 95vw;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      min-width: 350px;
+      width: 100%;
+      max-width: 430px;
+      max-height: 95vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.14);
       position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     .close {
       position: absolute;
@@ -67,30 +103,54 @@
       cursor: pointer;
     }
     .form-row {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
     .form-row label {
-      display: block;
-      margin-bottom: 5px;
       font-weight: bold;
       color: #001a34;
     }
-    .form-row input, .form-row textarea {
-      width: 100%;
+    .form-row input,
+    .form-row textarea {
       padding: 7px 10px;
       font-size: 1rem;
       border: 1px solid #d1e0ee;
       border-radius: 5px;
+      font-family: inherit;
+      margin-top: 3px;
+    }
+    @media (max-width: 600px) {
+      .main-content {
+        max-width: 98vw;
+        padding: 14px 4vw 30px 4vw;
+      }
+      .modal-content {
+        min-width: 98vw;
+        max-width: 99vw;
+        padding: 14px 4vw;
+      }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1 style="margin:0; font-size:2rem;">Use Case List</h1>
-    <button class="btn" id="addUseCaseBtn">Add Use Case</button>
+    <span class="header-title">Use Case List</span>
+    <div class="header-controls">
+      <select class="select" id="tagFilter">
+        <option value="">Filter by tag...</option>
+        <!-- Tags will go here -->
+      </select>
+      <button class="btn" id="addTagBtn">+ Add Tag</button>
+      <button class="btn" id="addUseCaseBtn">Add Use Case</button>
+    </div>
   </div>
-  
-  <!-- Modal -->
+  <div class="main-content">
+    <!-- List of use cases would go here in real app -->
+    <p style="color:#3a495f; font-size:1.1rem;">(List of use cases would be rendered here. Click "Add Use Case" to try the popup!)</p>
+  </div>
+  <!-- Modal for use case -->
   <div class="modal" id="addUseCaseModal">
     <div class="modal-content">
       <button class="close" id="closeModalBtn">&times;</button>
@@ -128,20 +188,47 @@
       </form>
     </div>
   </div>
-  
+  <!-- Modal for Add Tag -->
+  <div class="modal" id="addTagModal">
+    <div class="modal-content">
+      <button class="close" id="closeTagModalBtn">&times;</button>
+      <h2>Add New Tag</h2>
+      <form id="tagForm">
+        <div class="form-row">
+          <label for="tagName">Tag Name</label>
+          <input id="tagName" name="tag" required />
+        </div>
+        <button class="btn" type="submit">Add Tag</button>
+      </form>
+    </div>
+  </div>
   <script>
+    // Modal logic
     const addBtn = document.getElementById('addUseCaseBtn');
     const modal = document.getElementById('addUseCaseModal');
     const closeBtn = document.getElementById('closeModalBtn');
     addBtn.onclick = () => modal.classList.add('active');
     closeBtn.onclick = () => modal.classList.remove('active');
-    // Optional: hide modal on background click
     modal.onclick = e => { if(e.target === modal) modal.classList.remove('active'); };
-    // Demo: prevent default submit
+
+    // Add Tag Modal logic
+    const addTagBtn = document.getElementById('addTagBtn');
+    const addTagModal = document.getElementById('addTagModal');
+    const closeTagModalBtn = document.getElementById('closeTagModalBtn');
+    addTagBtn.onclick = () => addTagModal.classList.add('active');
+    closeTagModalBtn.onclick = () => addTagModal.classList.remove('active');
+    addTagModal.onclick = e => { if(e.target === addTagModal) addTagModal.classList.remove('active'); };
+
+    // Prevent default form submits (for demo)
     document.getElementById('useCaseForm').onsubmit = e => {
       e.preventDefault();
-      alert("Submitted! (You can wire this to Supabase.)");
+      alert("Submitted! (This would save to Supabase.)");
       modal.classList.remove('active');
+    }
+    document.getElementById('tagForm').onsubmit = e => {
+      e.preventDefault();
+      alert("Tag added! (This would save to Supabase.)");
+      addTagModal.classList.remove('active');
     }
   </script>
 </body>
