@@ -181,11 +181,17 @@ function renderUseCaseList() {
 let filtered = useCases.filter(uc => {
   if (!filter) return true;
 
+  const tagList = Array.isArray(uc.tags)
+    ? uc.tags
+    : typeof uc.tags === "string"
+      ? uc.tags.split(',').map(t => t.trim())
+      : [];
+
   if (filter === '_UNTAGGED') {
-    return !Array.isArray(uc.tags) || uc.tags.length === 0;
+    return tagList.length === 0;
   }
 
-  return Array.isArray(uc.tags) && uc.tags.includes(filter);
+  return tagList.includes(filter);
 });
 
   if (filtered.length === 0) {
