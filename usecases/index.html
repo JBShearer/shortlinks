@@ -177,6 +177,9 @@ function renderUseCaseList() {
   clearChildren(ucList);
 let filtered = useCases.filter(uc => {
   if (!filter) return true;
+  if (filter === '_UNTAGGED') {
+    return !Array.isArray(uc.tags) || uc.tags.length === 0;
+  }
   return Array.isArray(uc.tags) && uc.tags.includes(filter);
 });
   if (filtered.length === 0) {
@@ -192,7 +195,9 @@ let filtered = useCases.filter(uc => {
     row.innerHTML = `
       <span>${escapeHTML(uc.title)}</span>
       <span style="float:right; font-size:0.92rem; color:#147cbc; font-weight:600;">
-        ${uc.tags ? uc.tags.map(t=>`<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('') : ''}
+        ${uc.tags && uc.tags.length > 0
+  ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
+  : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
       </span>
     `;
     row.addEventListener('click', () => toggleUseCaseDetails(idx, row));
@@ -218,7 +223,9 @@ let filtered = useCases.filter(uc => {
       </div>
       <div style="margin:14px 0 6px 0;">
         <label style="font-weight:500;">Tags: </label>
-        ${uc.tags ? uc.tags.map(t=>`<span style="background:#eaf4fa; border-radius:7px; margin-left:0.18rem; padding:2px 8px;">${escapeHTML(t)}</span>`).join('') : ''}
+        ${uc.tags && uc.tags.length > 0
+  ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
+  : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
         <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
       </div>
     `;
@@ -233,16 +240,27 @@ function toggleUseCaseDetails(idx, row) {
 function renderTagDropdown() {
   let sel = $('#tagFilter');
   clearChildren(sel);
+
+  // Default option
   let opt = document.createElement('option');
   opt.value = '';
   opt.textContent = 'Filter by tag...';
   sel.appendChild(opt);
+
+  // Add all known tags
   tags.forEach(t => {
     let o = document.createElement('option');
     o.value = t;
     o.textContent = t;
     sel.appendChild(o);
   });
+
+  // Add special option for untagged
+  let untaggedOpt = document.createElement('option');
+  untaggedOpt.value = '_UNTAGGED';
+  untaggedOpt.textContent = '[Untagged Only]';
+  sel.appendChild(untaggedOpt);
+
   sel.value = selectedTag;
 }
 
