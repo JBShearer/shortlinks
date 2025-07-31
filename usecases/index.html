@@ -274,8 +274,6 @@ async function fetchTagsAndUseCases() {
 
   renderTagDropdown();
   renderUseCaseList();
-}
-  // ✅ Add this missing Supabase query to define ucRows
   let { data: ucRows, error: ucErr } = await supabase
     .from('use_cases')
     .select('*')
@@ -283,6 +281,9 @@ async function fetchTagsAndUseCases() {
 
   if (ucErr) {
     console.error("Error fetching use_cases:", ucErr);
+}
+  // ✅ Add this missing Supabase query to define ucRows
+  
     return;
   }
 
