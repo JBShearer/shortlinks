@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Use Case Lab | Architecture Reference</title>
+  <title>Use Case List | Architecture Reference</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
   <style>
     body { font-family: '72', Arial, sans-serif; margin: 0; background: #f5f8fa; }
@@ -23,12 +23,13 @@
     .modal { background: #fff; border-radius: 8px; padding: 30px; width: 420px; }
     .modal h2 { margin-top: 0;}
     input[type=text], textarea { width: 100%; padding: 7px 10px; margin-top: 3px; border-radius: 5px; border: 1px solid #d2dbe6;}
+    button[disabled] { opacity: 0.6; cursor: not-allowed; }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <div class="title">Use Case Lab <span style="font-size:1rem; font-weight:400;">| Architecture Reference</span></div>
+    <div class="title">Use Case List <span style="font-size:1rem; font-weight:400;">| Architecture Reference</span></div>
     <div>
       <button class="btn" id="addUseCaseBtn">Add Use Case</button>
       <select id="tagFilter"><option value="">All Tags</option></select>
@@ -40,7 +41,7 @@
 
 <!-- Add Use Case Modal -->
 <div class="modal-bg" id="useCaseModalBg">
-  <form class="modal" id="useCaseForm">
+  <form class="modal" id="useCaseForm" autocomplete="off">
     <h2>Add Use Case</h2>
     <div class="form-group">
       <label>Title</label>
@@ -66,7 +67,7 @@
       <input type="text" name="link3" placeholder="Label|https://..." />
     </div>
     <div style="text-align:right;">
-      <button type="button" onclick="closeModal()">Cancel</button>
+      <button type="button" id="cancelUseCaseBtn">Cancel</button>
       <button type="submit" class="btn">Add</button>
     </div>
   </form>
@@ -74,21 +75,21 @@
 
 <!-- Add Tag Modal -->
 <div class="modal-bg" id="tagModalBg">
-  <form class="modal" id="tagForm">
+  <form class="modal" id="tagForm" autocomplete="off">
     <h2>Add Tag</h2>
     <div class="form-group">
       <label>Tag Name</label>
       <input type="text" name="newtag" required />
     </div>
     <div style="text-align:right;">
-      <button type="button" onclick="closeTagModal()">Cancel</button>
+      <button type="button" id="cancelTagBtn">Cancel</button>
       <button type="submit" class="btn">Add Tag</button>
     </div>
   </form>
 </div>
 
-<script type="module">
-// === Supabase client setup ===
+<script>
+// Supabase config
 const SUPABASE_URL = "https://cgsfmpkcewemokbegnnt.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2ZtcGtjZXdlbW9rYmVnbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MzMyNzIsImV4cCI6MjA2OTQwOTI3Mn0.-5paJnbUuFWoIRSVAYcx3LRPYH5_HRjwjYcupvRKYLc";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -97,7 +98,76 @@ let useCases = [];
 let tags = [];
 let expanded = {};
 
-// --- Load use cases and tags from Supabase
+// Load data on start
+fetchUseCases();
+
+// --- DOM ELEMENTS ---
+const addUseCaseBtn = document.getElementById('addUseCaseBtn');
+const useCaseModalBg = document.getElementById('useCaseModalBg');
+const useCaseForm = document.getElementById('useCaseForm');
+const cancelUseCaseBtn = document.getElementById('cancelUseCaseBtn');
+
+const addTagBtn = document.getElementById('addTagBtn');
+const tagModalBg = document.getElementById('tagModalBg');
+const tagForm = document.getElementById('tagForm');
+const cancelTagBtn = document.getElementById('cancelTagBtn');
+const tagFilter = document.getElementById('tagFilter');
+
+// --- MODAL HANDLING ---
+addUseCaseBtn.addEventListener('click', function() {
+  useCaseModalBg.classList.add('show');
+  let opts = tags.map(t => `<option value="${t}"/>`).join('');
+  document.getElementById('tagOptions').innerHTML = opts;
+});
+cancelUseCaseBtn.addEventListener('click', function() {
+  useCaseModalBg.classList.remove('show');
+});
+
+addTagBtn.addEventListener('click', function() {
+  tagModalBg.classList.add('show');
+});
+cancelTagBtn.addEventListener('click', function() {
+  tagModalBg.classList.remove('show');
+});
+
+// --- USE CASE SUBMISSION ---
+useCaseForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  let data = new FormData(useCaseForm);
+  let tagArr = data.get('tags').split(',').map(t => t.trim()).filter(Boolean);
+  let newCase = {
+    title: data.get('title'),
+    description: data.get('description'),
+    embed: data.get('embed'),
+    tags: tagArr,
+    link1: data.get('link1'),
+    link2: data.get('link2'),
+    link3: data.get('link3')
+  };
+  const { error } = await supabase.from('use_cases').insert([newCase]);
+  if (!error) {
+    useCaseModalBg.classList.remove('show');
+    useCaseForm.reset();
+    fetchUseCases();
+  } else {
+    alert("Error adding use case.");
+  }
+});
+
+// --- TAG SUBMISSION ---
+tagForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  let t = tagForm.newtag.value.trim();
+  if (t && !tags.includes(t)) tags.push(t);
+  updateTagFilter();
+  tagModalBg.classList.remove('show');
+  tagForm.reset();
+});
+
+// --- TAG FILTER ---
+tagFilter.addEventListener('change', renderUseCases);
+
+// --- USE CASES FETCH/RENDER ---
 async function fetchUseCases() {
   const { data, error } = await supabase.from('use_cases').select('*').order('created_at', { ascending: false });
   if (data) {
@@ -109,17 +179,15 @@ async function fetchUseCases() {
     document.getElementById('usecases').innerHTML = "<div style='padding:24px'>Unable to load data.</div>";
   }
 }
-
 function collectTags() {
   tags = [];
   useCases.forEach(uc => {
     if (Array.isArray(uc.tags)) uc.tags.forEach(t => { if (!tags.includes(t)) tags.push(t); });
   });
 }
-
 function renderUseCases() {
   const list = document.getElementById('usecases');
-  let filter = document.getElementById('tagFilter').value;
+  let filter = tagFilter.value;
   list.innerHTML = '';
   useCases.forEach((u, idx) => {
     if (filter && (!u.tags || !u.tags.includes(filter))) return;
@@ -136,63 +204,16 @@ function renderUseCases() {
     list.innerHTML += main;
   });
 }
+// For expand/collapse usecase items
 window.toggleExpand = function(idx) {
   expanded[idx] = !expanded[idx];
   renderUseCases();
 }
 
-document.getElementById('addUseCaseBtn').onclick = () => {
-  document.getElementById('useCaseModalBg').classList.add('show');
-  // Prefill tag datalist
-  let opts = tags.map(t => `<option value="${t}"/>`).join('');
-  document.getElementById('tagOptions').innerHTML = opts;
-}
-window.closeModal = function() { document.getElementById('useCaseModalBg').classList.remove('show'); }
-
-document.getElementById('useCaseForm').onsubmit = async (e) => {
-  e.preventDefault();
-  let data = new FormData(e.target);
-  let tagArr = data.get('tags').split(',').map(t => t.trim()).filter(Boolean);
-  let newCase = {
-    title: data.get('title'),
-    description: data.get('description'),
-    embed: data.get('embed'),
-    tags: tagArr,
-    link1: data.get('link1'),
-    link2: data.get('link2'),
-    link3: data.get('link3')
-  };
-  const { error } = await supabase.from('use_cases').insert([newCase]);
-  if (!error) {
-    closeModal();
-    fetchUseCases();
-    e.target.reset();
-  } else {
-    alert("Error adding use case.");
-  }
-};
-
-document.getElementById('addTagBtn').onclick = () => {
-  document.getElementById('tagModalBg').classList.add('show');
-};
-window.closeTagModal = function() { document.getElementById('tagModalBg').classList.remove('show'); }
-document.getElementById('tagForm').onsubmit = (e) => {
-  e.preventDefault();
-  let t = e.target.newtag.value.trim();
-  if (t && !tags.includes(t)) tags.push(t);
-  updateTagFilter();
-  closeTagModal();
-  e.target.reset();
-};
-
 function updateTagFilter() {
-  let sel = document.getElementById('tagFilter');
+  let sel = tagFilter;
   sel.innerHTML = `<option value="">All Tags</option>` + tags.map(t => `<option value="${t}">${t}</option>`).join('');
 }
-document.getElementById('tagFilter').onchange = renderUseCases;
-
-// --- Start
-fetchUseCases();
 </script>
 </body>
 </html>
