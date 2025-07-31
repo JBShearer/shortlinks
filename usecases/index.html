@@ -236,14 +236,15 @@ const tagList = parseTagsField(uc.tags);
     let row = document.createElement('div');
     row.className = 'use-case-row';
     row.tabIndex = 0;
-    row.innerHTML = `
-      <span>${escapeHTML(uc.title)}</span>
-      <span style="float:right; font-size:0.92rem; color:#147cbc; font-weight:600;">
-        (uc.tags || []).length > 0
-  ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
-  : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
-      </span>
-    `;
+row.innerHTML = `
+  <span>${escapeHTML(uc.title)}</span>
+  <span style="float:right; font-size:0.92rem; color:#147cbc; font-weight:600;">
+    ${ (uc.tags || []).length > 0
+      ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
+      : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'
+    }
+  </span>
+`;
     row.addEventListener('click', () => toggleUseCaseDetails(idx, row));
     ucList.appendChild(row);
     let details = document.createElement('div');
