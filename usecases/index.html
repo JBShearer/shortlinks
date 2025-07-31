@@ -274,25 +274,13 @@ async function fetchTagsAndUseCases() {
 
   renderTagDropdown();
   renderUseCaseList();
-  let { data: ucRows, error: ucErr } = await supabase
-    .from('use_cases')
-    .select('*')
-    .order('created_at', { ascending: false, nullsLast: true });
 
-  if (ucErr) {
-    console.error("Error fetching use_cases:", ucErr);
-}
-  // ✅ Add this missing Supabase query to define ucRows
-  
-    return;
-  }
+useCases = ucRows || [];
+window.useCases = useCases; // so you can inspect in the console
+console.log("useCases loaded:", useCases);
 
-  useCases = ucRows || [];
-  window.useCases = useCases; // so you can inspect in the console
-  console.log("useCases loaded:", useCases);
-
-  renderTagDropdown();
-  renderUseCaseList();
+renderTagDropdown();
+renderUseCaseList();
 }
 
 // ------------- FORM POPUPS -------------
