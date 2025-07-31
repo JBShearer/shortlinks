@@ -242,7 +242,7 @@ const tagList = parseTagsField(uc.tags);
       <div style="margin-bottom:8px; color:#263;">
         ${escapeHTML(uc.description || '')}
       </div>
-      <div style="margin-bottom:8px;">${uc.embed_url || ''}</div>
+      <div class="embed-container">${uc.embed_url || ''}</div>
       <div>
         ${[1,2,3].map(i => uc['link'+i+'_label'] && uc['link'+i+'_url'] ?
           `<a href="${escapeHTML(uc['link'+i+'_url'])}" target="_blank" style="margin-right:15px; color:#147cbc; text-decoration:underline;">${escapeHTML(uc['link'+i+'_label'])}</a>` : '').join('')}
