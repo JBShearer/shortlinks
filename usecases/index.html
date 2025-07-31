@@ -253,24 +253,28 @@ const tagList = parseTagsField(uc.tags);
     details.style.margin = '10px 0 14px 0';
     details.style.padding = '12px 18px 15px 18px';
     details.style.boxShadow = '0 2px 10px #0001';
-    details.innerHTML = `
-      <div style="font-size:1.12rem; font-weight:600; margin-bottom:8px;">
-        ${escapeHTML(uc.title)}
-      </div>
-${uc.embed_url ? `<div class="responsive-embed-wrapper">${uc.embed_url}</div>` : ''}
-        ${escapeHTML(uc.description || '')}
-      </div>
-      <div>
-        ${[1,2,3].map(i => uc['link'+i+'_label'] && uc['link'+i+'_url'] ?
-          `<a href="${escapeHTML(uc['link'+i+'_url'])}" target="_blank" style="margin-right:15px; color:#147cbc; text-decoration:underline;">${escapeHTML(uc['link'+i+'_label'])}</a>` : '').join('')}
-      </div>
-      <div style="margin:14px 0 6px 0;">
-        <label style="font-weight:500;">Tags: </label>
-        ${uc.tags && uc.tags.length > 0
-  ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
-  : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
-        <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
-      </div>
+details.innerHTML = `
+  <div style="font-size:1.12rem; font-weight:600; margin-bottom:8px;">
+    ${escapeHTML(uc.title)}
+  </div>
+  <div style="margin-bottom:10px;">
+    ${escapeHTML(uc.description || '')}
+  </div>
+  <div style="margin-bottom:10px;">
+    <label style="font-weight:500;">Tags:</label>
+    ${uc.tags && uc.tags.length > 0
+      ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
+      : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
+    <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
+  </div>
+  ${uc.embed_url ? `<div class="responsive-embed-wrapper">${uc.embed_url}</div>` : ''}
+  <div style="margin-top:10px;">
+${[1,2,3].map(i => uc['link'+i+'_label'] && uc['link'+i+'_url'] ?
+  `<a href="${escapeHTML(uc['link'+i+'_url'])}" target="_blank" 
+    style="display:inline-flex; align-items:center; gap:6px; margin-right:10px; background:#003366; color:#fff; padding:6px 10px; border-radius:6px; font-size:0.92rem; text-decoration:none;">
+    📄 ${escapeHTML(uc['link'+i+'_label'])}
+  </a>` : '').join('')}
+  </div>`;
     `;
     // Ensure the iframe inside the wrapper is fully responsive
 const iframe = details.querySelector('iframe');
