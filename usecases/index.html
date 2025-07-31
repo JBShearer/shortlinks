@@ -262,6 +262,34 @@ if (tagScan) {
 }
 
 // Now fetch all use cases
+async function fetchTagsAndUseCases() {
+  // --- Fetch tags from all use cases
+  let { data: tagScan, error: tagErr } = await supabase.from('use_cases').select('tags');
+  tags = [];
+  if (tagScan) {
+    let tagSet = new Set();
+    tagScan.forEach(uc => (uc.tags || []).forEach(tag => tagSet.add(tag)));
+    tags = Array.from(tagSet).sort();
+  }
+
+  // ✅ Add this missing Supabase query to define ucRows
+  let { data: ucRows, error: ucErr } = await supabase
+    .from('use_cases')
+    .select('*')
+    .order('created_at', { ascending: false, nullsLast: true });
+
+  if (ucErr) {
+    console.error("Error fetching use_cases:", ucErr);
+    return;
+  }
+
+  useCases = ucRows || [];
+  window.useCases = useCases; // so you can inspect in the console
+  console.log("useCases loaded:", useCases);
+
+  renderTagDropdown();
+  renderUseCaseList();
+}
 useCases = ucRows || [];
 window.useCases = useCases; // ✅ make it globally accessible in the browser console
 console.log("useCases loaded:", useCases); // ✅ optional, for debugging
