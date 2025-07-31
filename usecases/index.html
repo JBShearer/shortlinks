@@ -190,13 +190,6 @@ function renderUseCaseList() {
     return;
   }
 
-  // ...rest of the render logic...
-}
-  if (filtered.length === 0) {
-    ucList.innerHTML = `<div style="color:#666; text-align:center; font-size:1.1rem;">
-      (No use cases${filter ? ' for this tag' : ''} yet)
-    </div>`;
-    return;
   }
   filtered.forEach((uc, idx) => {
     let row = document.createElement('div');
@@ -305,12 +298,7 @@ async function fetchTagsAndUseCases() {
   renderTagDropdown();
   renderUseCaseList();
 
-useCases = ucRows || [];
-window.useCases = useCases; // so you can inspect in the console
-console.log("useCases loaded:", useCases);
 
-renderTagDropdown();
-renderUseCaseList();
 }
 
 // ------------- FORM POPUPS -------------
@@ -457,6 +445,7 @@ document.addEventListener('submit', async function(e) {
     return;
   }
 });
+fetchTagsAndUseCases();
 </script>
 </body>
 </html>
