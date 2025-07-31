@@ -282,9 +282,18 @@ function renderTagDropdown() {
 
 // Load all tags and use cases (one call each)
 async function fetchTagsAndUseCases() {
-  // Fetch tags from use_cases table
+// ✅ Correctly fetch tags from the use_cases table
+let { data: tagScan, error: tagErr } = await supabase
+  .from('use_cases')
+  .select('tags');
+
+if (tagErr) {
+  console.error("❌ Error fetching tags:", tagErr);
+  return;
+}
+
 let tagSet = new Set();
-tagScan.forEach(uc => {
+(tagScan || []).forEach(uc => {
   const tagList = Array.isArray(uc.tags)
     ? uc.tags
     : typeof uc.tags === 'string'
