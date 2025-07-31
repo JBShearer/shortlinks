@@ -403,7 +403,7 @@ document.addEventListener('submit', async function(e) {
     let { data, error } = await supabase.from('use_cases').insert([insertObj]);
     if (error) alert("Error adding use case: " + error.message);
     $('#modalOverlay').style.display = 'none';
-    await fetchTagsAndUseCases();
+    fetchTagsAndUseCases();
     return;
   }
   // Add Tag
@@ -440,7 +440,6 @@ document.addEventListener('submit', async function(e) {
     // Update the use_case in DB
     await supabase.from('use_cases').update({ tags: newTags, updated_at: new Date().toISOString() }).eq('id', ucId);
     $('#modalOverlay').style.display = 'none';
-    await fetchTagsAndUseCases();
     return;
   }
 });
