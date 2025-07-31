@@ -175,13 +175,26 @@ function clearChildren(node) { while (node.firstChild) node.removeChild(node.fir
 function renderUseCaseList() {
   const ucList = $('#useCaseList');
   clearChildren(ucList);
-let filtered = useCases.filter(uc => {
-  if (!filter) return true;
-  if (filter === '_UNTAGGED') {
-    return !Array.isArray(uc.tags) || uc.tags.length === 0;
+function renderUseCaseList() {
+  const ucList = $('#useCaseList');
+  clearChildren(ucList);
+
+  const filter = selectedTag; // ✅ Define filter based on selected tag
+
+  let filtered = useCases.filter(uc => {
+    if (!filter) return true;
+    return Array.isArray(uc.tags) && uc.tags.includes(filter);
+  });
+
+  if (filtered.length === 0) {
+    ucList.innerHTML = `<div style="color:#666; text-align:center; font-size:1.1rem;">
+      (No use cases${filter ? ' for this tag' : ''} yet)
+    </div>`;
+    return;
   }
-  return Array.isArray(uc.tags) && uc.tags.includes(filter);
-});
+
+  // ...rest of the render logic...
+}
   if (filtered.length === 0) {
     ucList.innerHTML = `<div style="color:#666; text-align:center; font-size:1.1rem;">
       (No use cases${filter ? ' for this tag' : ''} yet)
