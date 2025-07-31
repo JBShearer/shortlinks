@@ -37,11 +37,12 @@
       font-size: 2rem;
       font-weight: bold;
     }
-    .navbar-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
+.navbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
     .btn {
       background: var(--sap-primary);
       color: #fff;
@@ -56,12 +57,13 @@
     .btn:hover {
       background: #004c97;
     }
-    .filter-select {
-      border-radius: 7px;
-      font-size: 1rem;
-      padding: 0.46rem 0.9rem;
-      border: 1px solid #ccc;
-    }
+.filter-select {
+  min-width: 180px;
+  border-radius: 7px;
+  font-size: 1rem;
+  padding: 0.46rem 0.9rem;
+  border: 1px solid #ccc;
+}
     .container {
       max-width: 960px;
       margin: 2.5rem auto;
@@ -147,10 +149,19 @@
   <div class="navbar">
     <span class="navbar-title">Use Case List</span>
     <div class="navbar-controls">
-      <select class="filter-select" id="tagFilter">
-        <option value="">Filter by tag...</option>
-        <!-- tags go here -->
-      </select>
+<select class="filter-select" id="tagFilter">
+  <option value="">Filter by tag...</option>
+  <!-- tags get injected via JS -->
+</select>
+
+<select class="filter-select" id="sortSelect">
+  <option value="created_desc">Sort: Newest</option>
+  <option value="created_asc">Sort: Oldest</option>
+  <option value="az">Sort: A → Z</option>
+  <option value="za">Sort: Z → A</option>
+  <option value="tagcount">Sort: Most Tags</option>
+</select>
+      
       <button class="btn" id="addTagBtn">+ Add Tag</button>
       <button class="btn" id="addUseCaseBtn">Add Use Case</button>
     </div>
@@ -200,7 +211,7 @@ window.useCases = useCases; // share to global for debugging if needed
 let tags = [];
 let tagToId = {}; // tag text => tag id (if using a tags table)
 let selectedTag = "";
-
+let currentSort = 'created_desc';
 // ------------ UTILITIES ----------
 function $(sel) { return document.querySelector(sel); }
 function escapeHTML(str) { return (str+'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
@@ -231,7 +242,27 @@ const tagList = parseTagsField(uc.tags);
     </div>`;
     return;
   }
-
+  // Apply sorting
+  switch (currentSort) {
+    case 'az':
+      filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+      break;
+    case 'za':
+      filtered.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+      break;
+    case 'tagcount':
+      filtered.sort((a, b) =>
+        parseTagsField(b.tags).length - parseTagsField(a.tags).length
+      );
+      break;
+    case 'created_asc':
+      filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      break;
+    case 'created_desc':
+    default:
+      filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      break;
+  }
   filtered.forEach((uc, idx) => {
     let row = document.createElement('div');
     row.className = 'use-case-row';
@@ -263,17 +294,32 @@ const linkButtonsHTML = [1,2,3].map(i =>
 ).join('');
 
 details.innerHTML = `
-<div style="font-size:1.12rem; font-weight:600; margin-bottom:8px;">
-  ${escapeHTML(uc.title)}
-  <button class="btn" style="margin-left:12px; font-size:0.9rem; padding:3px 11px;"
-    onclick="event.stopPropagation(); showEditUseCaseForm('${uc.id}')">✎ Edit</button>
-</div>
+  <div style="font-size:1.12rem; font-weight:600; margin-bottom:8px;">
+    ${escapeHTML(uc.title)}
+    <button class="btn" style="margin-left:12px; font-size:0.9rem; padding:3px 11px;"
+      onclick="event.stopPropagation(); showEditUseCaseForm('${uc.id}')">✎ Edit</button>
+  </div>
   <div style="margin-bottom:10px;">
     ${escapeHTML(uc.description || '')}
   </div>
+  <div style="margin-bottom:14px;">
+    <div style="font-weight:500; margin-bottom:6px;">Customer Use Cases:</div>
+    <div style="display: grid; grid-template-columns: repeat(3, auto); gap: 10px;">
+      ${linkButtonsHTML}
+    </div>
+  </div>
+  <div style="margin-bottom:10px;">
+    <label style="font-weight:500;">Tags:</label>
+    ${uc.tags && uc.tags.length > 0
+      ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
+      : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
+    <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
+  </div>
+  ${uc.embed_url ? `<div class="responsive-embed-wrapper">${uc.embed_url}</div>` : ''}
+`;
     <div style="margin-bottom:14px;">
     <div style="font-weight:500; margin-bottom:6px;">Customer Use Cases:</div>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+  <div style="display: grid; grid-template-columns: repeat(3, auto); gap: 10px;">
       ${linkButtonsHTML}
     </div>
   </div>
@@ -397,6 +443,11 @@ $('#addTagBtn').onclick = function() {
 };
 $('#tagFilter').onchange = function() {
   selectedTag = this.value;
+  renderUseCaseList();
+};
+
+$('#sortSelect').onchange = function() {
+  currentSort = this.value;
   renderUseCaseList();
 };
 
