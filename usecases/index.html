@@ -2,218 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Use Case List | Architecture Reference</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+  <title>Use Case List</title>
   <style>
-    body { font-family: '72', Arial, sans-serif; margin: 0; background: #f5f8fa; }
-    .container { max-width: 980px; margin: 30px auto; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 10px #0002; }
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;}
-    .title { font-size: 2rem; font-weight: 700; color: #063970; }
-    .btn { padding: 8px 18px; background: #0faaff; border: none; color: #fff; border-radius: 5px; font-weight: bold; cursor: pointer; margin-right: 12px;}
-    .tag-btn { padding: 5px 10px; background: #eaf6fd; color: #0faaff; border: 1px solid #0faaff; border-radius: 4px; cursor: pointer; font-size: 1rem; }
-    .form-group { margin: 10px 0; }
-    .usecase-list { border-radius: 8px; border: 1px solid #eef3f9; background: #fcfdff; }
-    .usecase { border-bottom: 1px solid #e3e8ef; cursor: pointer; padding: 12px 0;}
-    .usecase:last-child { border-bottom: none; }
-    .usecase .expand { background: #f4f7fb; margin: 10px 0; border-radius: 6px; padding: 18px;}
-    .tag { background: #c6e2fa; color: #095d93; padding: 2px 8px; border-radius: 12px; margin-right: 6px; font-size: .95em; display: inline-block;}
-    .modal-bg { display: none; position: fixed; left: 0; top:0; right: 0; bottom: 0; background: #0006; align-items: center; justify-content: center; z-index: 100;}
-    .modal-bg.show { display: flex; }
-    .modal { background: #fff; border-radius: 8px; padding: 30px; width: 420px; }
-    .modal h2 { margin-top: 0;}
-    input[type=text], textarea { width: 100%; padding: 7px 10px; margin-top: 3px; border-radius: 5px; border: 1px solid #d2dbe6;}
-    button[disabled] { opacity: 0.6; cursor: not-allowed; }
+    body {
+      font-family: "72", Arial, sans-serif;
+      background: #f6fafd;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 32px;
+      background: #001a34;
+      color: #fff;
+    }
+    .btn {
+      background-color: #0a6ed1;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #035c9e;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.45);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 32px 24px;
+      border-radius: 12px;
+      min-width: 320px;
+      max-width: 95vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #888;
+      cursor: pointer;
+    }
+    .form-row {
+      margin-bottom: 18px;
+    }
+    .form-row label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #001a34;
+    }
+    .form-row input, .form-row textarea {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 1rem;
+      border: 1px solid #d1e0ee;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-<div class="container">
   <div class="header">
-    <div class="title">Use Case List <span style="font-size:1rem; font-weight:400;">| Architecture Reference</span></div>
-    <div>
-      <button class="btn" id="addUseCaseBtn">Add Use Case</button>
-      <select id="tagFilter"><option value="">All Tags</option></select>
-      <button class="tag-btn" id="addTagBtn">+ Add Tag</button>
+    <h1 style="margin:0; font-size:2rem;">Use Case List</h1>
+    <button class="btn" id="addUseCaseBtn">Add Use Case</button>
+  </div>
+  
+  <!-- Modal -->
+  <div class="modal" id="addUseCaseModal">
+    <div class="modal-content">
+      <button class="close" id="closeModalBtn">&times;</button>
+      <h2>Add New Use Case</h2>
+      <form id="useCaseForm">
+        <div class="form-row">
+          <label for="useCaseTitle">Title</label>
+          <input id="useCaseTitle" name="title" required />
+        </div>
+        <div class="form-row">
+          <label for="useCaseDesc">Description</label>
+          <textarea id="useCaseDesc" name="desc" rows="3" required></textarea>
+        </div>
+        <div class="form-row">
+          <label for="useCaseEmbed">Architecture Embed Code</label>
+          <textarea id="useCaseEmbed" name="embed" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <label for="useCaseTags">Tags (comma separated)</label>
+          <input id="useCaseTags" name="tags" />
+        </div>
+        <div class="form-row">
+          <label for="customerStory1">Customer Story Link 1 (optional)</label>
+          <input id="customerStory1" name="story1" type="url" />
+        </div>
+        <div class="form-row">
+          <label for="customerStory2">Customer Story Link 2 (optional)</label>
+          <input id="customerStory2" name="story2" type="url" />
+        </div>
+        <div class="form-row">
+          <label for="customerStory3">Customer Story Link 3 (optional)</label>
+          <input id="customerStory3" name="story3" type="url" />
+        </div>
+        <button class="btn" type="submit">Submit</button>
+      </form>
     </div>
   </div>
-  <div id="usecases" class="usecase-list"></div>
-</div>
-
-<!-- Add Use Case Modal -->
-<div class="modal-bg" id="useCaseModalBg">
-  <form class="modal" id="useCaseForm" autocomplete="off">
-    <h2>Add Use Case</h2>
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" name="title" required />
-    </div>
-    <div class="form-group">
-      <label>Description</label>
-      <textarea name="description" required></textarea>
-    </div>
-    <div class="form-group">
-      <label>Embed Code</label>
-      <textarea name="embed" placeholder='Paste iframe or embed code here' required></textarea>
-    </div>
-    <div class="form-group">
-      <label>Tags (comma separated or pick existing)</label>
-      <input type="text" name="tags" placeholder="AI, Integration" list="tagOptions"/>
-      <datalist id="tagOptions"></datalist>
-    </div>
-    <div class="form-group">
-      <label>Related Links</label>
-      <input type="text" name="link1" placeholder="Label|https://..." />
-      <input type="text" name="link2" placeholder="Label|https://..." />
-      <input type="text" name="link3" placeholder="Label|https://..." />
-    </div>
-    <div style="text-align:right;">
-      <button type="button" id="cancelUseCaseBtn">Cancel</button>
-      <button type="submit" class="btn">Add</button>
-    </div>
-  </form>
-</div>
-
-<!-- Add Tag Modal -->
-<div class="modal-bg" id="tagModalBg">
-  <form class="modal" id="tagForm" autocomplete="off">
-    <h2>Add Tag</h2>
-    <div class="form-group">
-      <label>Tag Name</label>
-      <input type="text" name="newtag" required />
-    </div>
-    <div style="text-align:right;">
-      <button type="button" id="cancelTagBtn">Cancel</button>
-      <button type="submit" class="btn">Add Tag</button>
-    </div>
-  </form>
-</div>
-
-<script>
-// Supabase config
-const SUPABASE_URL = "https://cgsfmpkcewemokbegnnt.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2ZtcGtjZXdlbW9rYmVnbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MzMyNzIsImV4cCI6MjA2OTQwOTI3Mn0.-5paJnbUuFWoIRSVAYcx3LRPYH5_HRjwjYcupvRKYLc";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let useCases = [];
-let tags = [];
-let expanded = {};
-
-// Load data on start
-fetchUseCases();
-
-// --- DOM ELEMENTS ---
-const addUseCaseBtn = document.getElementById('addUseCaseBtn');
-const useCaseModalBg = document.getElementById('useCaseModalBg');
-const useCaseForm = document.getElementById('useCaseForm');
-const cancelUseCaseBtn = document.getElementById('cancelUseCaseBtn');
-
-const addTagBtn = document.getElementById('addTagBtn');
-const tagModalBg = document.getElementById('tagModalBg');
-const tagForm = document.getElementById('tagForm');
-const cancelTagBtn = document.getElementById('cancelTagBtn');
-const tagFilter = document.getElementById('tagFilter');
-
-// --- MODAL HANDLING ---
-addUseCaseBtn.addEventListener('click', function() {
-  useCaseModalBg.classList.add('show');
-  let opts = tags.map(t => `<option value="${t}"/>`).join('');
-  document.getElementById('tagOptions').innerHTML = opts;
-});
-cancelUseCaseBtn.addEventListener('click', function() {
-  useCaseModalBg.classList.remove('show');
-});
-
-addTagBtn.addEventListener('click', function() {
-  tagModalBg.classList.add('show');
-});
-cancelTagBtn.addEventListener('click', function() {
-  tagModalBg.classList.remove('show');
-});
-
-// --- USE CASE SUBMISSION ---
-useCaseForm.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  let data = new FormData(useCaseForm);
-  let tagArr = data.get('tags').split(',').map(t => t.trim()).filter(Boolean);
-  let newCase = {
-    title: data.get('title'),
-    description: data.get('description'),
-    embed: data.get('embed'),
-    tags: tagArr,
-    link1: data.get('link1'),
-    link2: data.get('link2'),
-    link3: data.get('link3')
-  };
-  const { error } = await supabase.from('use_cases').insert([newCase]);
-  if (!error) {
-    useCaseModalBg.classList.remove('show');
-    useCaseForm.reset();
-    fetchUseCases();
-  } else {
-    alert("Error adding use case.");
-  }
-});
-
-// --- TAG SUBMISSION ---
-tagForm.addEventListener('submit', function(e) {
-  e.preventDefault();
-  let t = tagForm.newtag.value.trim();
-  if (t && !tags.includes(t)) tags.push(t);
-  updateTagFilter();
-  tagModalBg.classList.remove('show');
-  tagForm.reset();
-});
-
-// --- TAG FILTER ---
-tagFilter.addEventListener('change', renderUseCases);
-
-// --- USE CASES FETCH/RENDER ---
-async function fetchUseCases() {
-  const { data, error } = await supabase.from('use_cases').select('*').order('created_at', { ascending: false });
-  if (data) {
-    useCases = data;
-    collectTags();
-    renderUseCases();
-    updateTagFilter();
-  } else {
-    document.getElementById('usecases').innerHTML = "<div style='padding:24px'>Unable to load data.</div>";
-  }
-}
-function collectTags() {
-  tags = [];
-  useCases.forEach(uc => {
-    if (Array.isArray(uc.tags)) uc.tags.forEach(t => { if (!tags.includes(t)) tags.push(t); });
-  });
-}
-function renderUseCases() {
-  const list = document.getElementById('usecases');
-  let filter = tagFilter.value;
-  list.innerHTML = '';
-  useCases.forEach((u, idx) => {
-    if (filter && (!u.tags || !u.tags.includes(filter))) return;
-    let tagHtml = (u.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
-    let main = `<div class="usecase" onclick="toggleExpand(${idx})"><strong>${u.title}</strong> ${tagHtml}</div>`;
-    if (expanded[idx]) {
-      let links = [u.link1, u.link2, u.link3].filter(l => l).map(l => {
-        let [label, url] = l.split('|');
-        return `<div><a href="${url}" target="_blank">${label}</a></div>`;
-      }).join('');
-      main += `<div class="expand"><div>${u.description}</div>
-      <div style="margin: 15px 0;">${u.embed || ''}</div>${links}</div>`;
+  
+  <script>
+    const addBtn = document.getElementById('addUseCaseBtn');
+    const modal = document.getElementById('addUseCaseModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+    addBtn.onclick = () => modal.classList.add('active');
+    closeBtn.onclick = () => modal.classList.remove('active');
+    // Optional: hide modal on background click
+    modal.onclick = e => { if(e.target === modal) modal.classList.remove('active'); };
+    // Demo: prevent default submit
+    document.getElementById('useCaseForm').onsubmit = e => {
+      e.preventDefault();
+      alert("Submitted! (You can wire this to Supabase.)");
+      modal.classList.remove('active');
     }
-    list.innerHTML += main;
-  });
-}
-// For expand/collapse usecase items
-window.toggleExpand = function(idx) {
-  expanded[idx] = !expanded[idx];
-  renderUseCases();
-}
-
-function updateTagFilter() {
-  let sel = tagFilter;
-  sel.innerHTML = `<option value="">All Tags</option>` + tags.map(t => `<option value="${t}">${t}</option>`).join('');
-}
-</script>
+  </script>
 </body>
 </html>
