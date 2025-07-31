@@ -257,9 +257,7 @@ const tagList = parseTagsField(uc.tags);
       <div style="font-size:1.12rem; font-weight:600; margin-bottom:8px;">
         ${escapeHTML(uc.title)}
       </div>
-      <div class="responsive-embed-wrapper">
-  ${uc.embed_url || ''}
-</div>
+${uc.embed_url ? `<div class="responsive-embed-wrapper">${uc.embed_url}</div>` : ''}
         ${escapeHTML(uc.description || '')}
       </div>
       <div>
