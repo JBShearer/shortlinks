@@ -282,15 +282,6 @@ function renderTagDropdown() {
 
 // Load all tags and use cases (one call each)
 async function fetchTagsAndUseCases() {
-// ✅ Correctly fetch tags from the use_cases table
-let { data: tagScan, error: tagErr } = await supabase
-  .from('use_cases')
-  .select('tags');
-
-if (tagErr) {
-  console.error("❌ Error fetching tags:", tagErr);
-  return;
-}
 
 // ✅ Proper fetch and tag extraction from Supabase
 let { data: tagScan, error: tagErr } = await supabase
