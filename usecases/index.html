@@ -175,10 +175,10 @@ function clearChildren(node) { while (node.firstChild) node.removeChild(node.fir
 function renderUseCaseList() {
   const ucList = $('#useCaseList');
   clearChildren(ucList);
-  let filter = selectedTag;
-  let filtered = useCases.filter(uc =>
-  !filter || (Array.isArray(uc.tags) && uc.tags.includes(filter))
-);
+let filtered = useCases.filter(uc => {
+  if (!filter) return true;
+  return Array.isArray(uc.tags) && uc.tags.includes(filter);
+});
   if (filtered.length === 0) {
     ucList.innerHTML = `<div style="color:#666; text-align:center; font-size:1.1rem;">
       (No use cases${filter ? ' for this tag' : ''} yet)
