@@ -123,6 +123,24 @@
       .container { padding: 0 0.3rem; }
       .modal { min-width: 96vw; padding: 1.2rem 0.5rem; }
     }
+    /* Responsive iframe wrapper */
+.responsive-embed-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+  margin: 1rem 0;
+}
+.responsive-embed-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+}
   </style>
 </head>
 <body>
@@ -257,6 +275,14 @@ const tagList = parseTagsField(uc.tags);
         <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
       </div>
     `;
+    // Ensure the iframe inside the wrapper is fully responsive
+const iframe = details.querySelector('iframe');
+if (iframe) {
+  iframe.removeAttribute('width');
+  iframe.removeAttribute('height');
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+}
     row.after(details);
     row.detailsNode = details;
   });
