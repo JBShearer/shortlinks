@@ -292,6 +292,16 @@ if (tagErr) {
   return;
 }
 
+// ✅ Proper fetch and tag extraction from Supabase
+let { data: tagScan, error: tagErr } = await supabase
+  .from('use_cases')
+  .select('tags');
+
+if (tagErr) {
+  console.error("❌ Error fetching tags:", tagErr);
+  return;
+}
+
 let tagSet = new Set();
 (tagScan || []).forEach(uc => {
   const tagList = Array.isArray(uc.tags)
