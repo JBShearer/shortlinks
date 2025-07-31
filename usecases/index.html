@@ -365,7 +365,7 @@ document.addEventListener('submit', async function(e) {
       link2_url: fd.get('link2_url'),
       link3_label: fd.get('link3_label'),
       link3_url: fd.get('link3_url'),
-      tags: tagsArr,
+      tags: tagsArr.length > 0 ? tagsArr : [] 
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
