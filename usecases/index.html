@@ -152,12 +152,12 @@
       <div id="modalContent"></div>
     </div>
   </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
 // ------------ SUPABASE CONFIG -----------
 const SUPABASE_URL = "https://cgsfmpkcewemokbegnnt.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2ZtcGtjZXdlbW9rYmVnbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MzMyNzIsImV4cCI6MjA2OTQwOTI3Mn0.-5paJnbUuFWoIRSVAYcx3LRPYH5_HRjwjYcupvRKYLc";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ------------ STATE -------------
 let useCases = [];
