@@ -262,9 +262,9 @@ if (tagScan) {
 }
 
 // Now fetch all use cases
-let { data: ucRows, error: ucErr } = await supabase.from('use_cases').select('*').order('created_at', { ascending: false, nullsLast: true });
 useCases = ucRows || [];
-window.useCases = useCases; // ← expose to console
+window.useCases = useCases; // ✅ make it globally accessible in the browser console
+console.log("useCases loaded:", useCases); // ✅ optional, for debugging
 renderTagDropdown();
 renderUseCaseList();
 }
