@@ -366,8 +366,8 @@ document.addEventListener('submit', async function(e) {
       link3_label: fd.get('link3_label'),
       link3_url: fd.get('link3_url'),
       tags: tagsArr,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      // created_at: new Date().toISOString(),
+      // updated_at: new Date().toISOString()
     };
     let { data, error } = await supabase.from('use_cases').insert([insertObj]);
     if (error) alert("Error adding use case: " + error.message);
