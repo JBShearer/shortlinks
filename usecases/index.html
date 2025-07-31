@@ -252,17 +252,17 @@ async function fetchTagsAndUseCases() {
   // tags = tagRows ? tagRows.map(row => row.tag) : [];
 
   // If not, derive tags from all use_cases' tags arrays
-  let { data, error } = await supabase.from('use_cases').select('tags');
-  tags = [];
-  if (data) {
-    let tagSet = new Set();
-    data.forEach(uc => (uc.tags||[]).forEach(tag => tagSet.add(tag)));
-    tags = Array.from(tagSet).sort();
-  }
+  let { data: tagScan, error: tagErr } = await supabase.from('use_cases').select('tags');
+tags = [];
+if (tagScan) {
+  let tagSet = new Set();
+  tagScan.forEach(uc => (uc.tags || []).forEach(tag => tagSet.add(tag)));
+  tags = Array.from(tagSet).sort();
+}
 
-  // Now fetch all use cases
-  let { data: ucRows, error: ucErr } = await supabase.from('use_cases').select('*').order('created_at', { ascending: false, nullsLast: true });
-  useCases = ucRows || [];
+// Now fetch all use cases
+let { data: ucRows, error: ucErr } = await supabase.from('use_cases').select('*').order('created_at', { ascending: false, nullsLast: true });
+useCases = ucRows || [];
   renderTagDropdown();
   renderUseCaseList();
 }
