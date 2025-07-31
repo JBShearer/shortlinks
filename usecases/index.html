@@ -1,394 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Use Case List</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+  <meta charset="UTF-8" />
+  <title>Use Case List | SAP Reference</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=72:400,600&display=swap" />
   <style>
+    :root {
+      --sap-primary: #0a6ed1;
+      --sap-bg: #f6f8fa;
+      --sap-navbar: #11263c;
+      --sap-card-bg: #fff;
+      --sap-shadow: 0 6px 24px #0001;
+      --sap-radius: 14px;
+    }
     body {
       margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', 'Arial', sans-serif;
-      background: #f5f7fa;
-      color: #23313d;
+      font-family: '72', Arial, sans-serif;
+      background: var(--sap-bg);
+      color: #223;
+      min-height: 100vh;
     }
-    .header {
-      background: #10243d;
-      color: #fff;
+    .navbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 30px 20px 30px;
-      border-bottom: 2px solid #0a6ed1;
+      background: var(--sap-navbar);
+      color: white;
+      padding: 1.3rem 2rem 1.1rem 2rem;
+      font-size: 2.1rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
     }
-    .header-title {
+    .navbar-title {
       font-size: 2rem;
       font-weight: bold;
-      letter-spacing: -1px;
     }
-    .header-controls {
+    .navbar-controls {
       display: flex;
-      gap: 12px;
       align-items: center;
+      gap: 0.7rem;
     }
     .btn {
-      background: #0a6ed1;
+      background: var(--sap-primary);
       color: #fff;
       border: none;
-      padding: 0.6em 1.2em;
+      border-radius: 7px;
+      padding: 0.52rem 1.2rem;
       font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background .2s;
       font-weight: 600;
-      outline: none;
+      cursor: pointer;
+      transition: background 0.18s;
     }
     .btn:hover {
-      background: #094c93;
+      background: #004c97;
     }
-    .select {
-      padding: 0.45em 0.8em;
-      border-radius: 8px;
-      border: 1px solid #dde8f2;
-      background: #fff;
+    .filter-select {
+      border-radius: 7px;
       font-size: 1rem;
-      min-width: 150px;
+      padding: 0.46rem 0.9rem;
+      border: 1px solid #ccc;
     }
-    .main-content {
-      max-width: 1000px;
-      margin: 32px auto 0 auto;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px #10243d12;
-      padding: 36px;
+    .container {
+      max-width: 960px;
+      margin: 2.5rem auto;
+      padding: 0 1rem;
     }
+    .use-case-list {
+      background: var(--sap-card-bg);
+      border-radius: var(--sap-radius);
+      min-height: 280px;
+      box-shadow: var(--sap-shadow);
+      padding: 1.6rem 1.2rem;
+      margin-bottom: 1.5rem;
+      transition: box-shadow 0.2s;
+    }
+    /* Placeholder for expandable rows (future) */
     .use-case-row {
-      border-bottom: 1px solid #e6ecf5;
-      padding: 18px 0;
-      transition: background 0.2s;
-    }
-    .use-case-row:last-child {
-      border-bottom: none;
-    }
-    .use-case-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #0a6ed1;
-      margin-bottom: 6px;
-      letter-spacing: -.5px;
-    }
-    .tags {
-      margin-bottom: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .tag {
-      background: #eaf6fd;
-      color: #0a6ed1;
-      border-radius: 6px;
-      padding: 2px 12px;
-      font-size: .99em;
-      font-weight: 500;
-      display: inline-block;
-    }
-    details summary {
+      border-bottom: 1px solid #eef0f3;
+      padding: 0.7rem 0.3rem;
       cursor: pointer;
+      font-size: 1.13rem;
       font-weight: 500;
-      color: #10243d;
-      outline: none;
-      font-size: 1.07em;
+      background: none;
+      transition: background 0.15s;
     }
-    details[open] summary {
-      color: #0a6ed1;
-    }
-    .details-body {
-      margin-top: 14px;
-      padding-left: 8px;
-    }
-    .embed-arch {
-      margin: 14px 0 14px 0;
-    }
-    .story-links ul {
-      list-style: none;
-      padding-left: 0;
-      margin: 0 0 6px 0;
-    }
-    .story-links li a {
-      color: #094c93;
-      text-decoration: underline;
-      transition: color .2s;
-    }
-    .story-links li a:hover {
-      color: #10243d;
-    }
-    .created-at {
-      color: #6d8095;
-      font-size: .96em;
-      margin-top: 8px;
-    }
-    /* Modal styling */
-    .modal {
+    .use-case-row:last-child { border-bottom: none; }
+    .use-case-row:hover { background: #f2f7fb; }
+    /* Modal skeleton */
+    .modal-overlay {
       display: none;
       position: fixed;
+      inset: 0;
       z-index: 10;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(16,36,61,0.15);
+      background: #11263ccc;
       align-items: center;
       justify-content: center;
     }
-    .modal.active {
-      display: flex;
-    }
-    .modal-content {
+    .modal {
       background: #fff;
-      padding: 2.2em 2.8em 2.2em 2.8em;
-      border-radius: 14px;
-      box-shadow: 0 8px 40px #0a6ed150;
-      max-width: 430px;
-      width: 100%;
+      border-radius: 15px;
+      max-width: 470px;
+      min-width: 320px;
+      padding: 2.2rem 2rem 1.2rem 2rem;
+      box-shadow: 0 8px 48px #0004;
       position: relative;
-      animation: popup-in .24s cubic-bezier(.52,.19,.43,.92);
+      font-size: 1rem;
     }
-    @keyframes popup-in {
-      0% { transform: translateY(40px) scale(.96);}
-      100% { transform: translateY(0) scale(1);}
-    }
-    .close {
+    .modal .close {
       position: absolute;
-      top: 14px; right: 22px;
-      font-size: 1.5rem;
-      color: #bbb;
+      top: 1.3rem;
+      right: 1.4rem;
       background: none;
       border: none;
+      font-size: 1.7rem;
+      color: #888;
       cursor: pointer;
-      transition: color .2s;
-      font-weight: bold;
+      padding: 0;
     }
-    .close:hover {
-      color: #0a6ed1;
-    }
-    .modal-content label {
-      display: block;
-      margin-bottom: 3px;
-      font-weight: 500;
-      margin-top: 1.1em;
-      font-size: 1em;
-    }
-    .modal-content input, .modal-content textarea {
-      width: 100%;
-      border-radius: 7px;
-      border: 1px solid #dbe6ef;
-      padding: 8px 10px;
-      font-size: 1rem;
-      background: #f8fbfd;
-      margin-bottom: 7px;
-    }
-    .modal-content textarea {
-      resize: vertical;
-      min-height: 48px;
-    }
-    .modal-content .btn {
-      width: 100%;
-      margin-top: 1.2em;
-    }
-    @media (max-width: 700px) {
-      .main-content { padding: 13px; }
-      .modal-content { padding: 1em; }
-      .header { flex-direction: column; gap: 14px; padding: 18px 6px;}
-      .header-title { font-size: 1.28em;}
+    @media (max-width: 680px) {
+      .container { padding: 0 0.3rem; }
+      .modal { min-width: 96vw; padding: 1.2rem 0.5rem; }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <span class="header-title">Use Case List</span>
-    <div class="header-controls">
-      <select class="select" id="tagFilter">
+  <div class="navbar">
+    <span class="navbar-title">Use Case List</span>
+    <div class="navbar-controls">
+      <select class="filter-select" id="tagFilter">
         <option value="">Filter by tag...</option>
+        <!-- tags go here -->
       </select>
-      <button class="btn" id="addTagBtn" type="button">+ Add Tag</button>
-      <button class="btn" id="addUseCaseBtn" type="button">Add Use Case</button>
+      <button class="btn" id="addTagBtn">+ Add Tag</button>
+      <button class="btn" id="addUseCaseBtn">Add Use Case</button>
     </div>
   </div>
-  <div class="main-content" id="useCaseList">
-    <p>Loading use cases…</p>
-  </div>
-
-  <!-- Add Use Case Modal -->
-  <div class="modal" id="addUseCaseModal">
-    <div class="modal-content">
-      <button class="close" id="closeModalBtn">&times;</button>
-      <h2 style="margin-top:0">Add New Use Case</h2>
-      <form id="useCaseForm" autocomplete="off">
-        <label for="useCaseTitle">Title</label>
-        <input id="useCaseTitle" name="title" required />
-
-        <label for="useCaseDesc">Description</label>
-        <textarea id="useCaseDesc" name="desc" rows="2"></textarea>
-
-        <label for="useCaseEmbed">Architecture Embed Code</label>
-        <textarea id="useCaseEmbed" name="embed_url" rows="2"></textarea>
-
-        <label>Customer Story Link 1 Label</label>
-        <input id="link1_label" name="link1_label" type="text"/>
-        <label>Customer Story Link 1 URL</label>
-        <input id="link1_url" name="link1_url" type="url"/>
-
-        <label>Customer Story Link 2 Label</label>
-        <input id="link2_label" name="link2_label" type="text"/>
-        <label>Customer Story Link 2 URL</label>
-        <input id="link2_url" name="link2_url" type="url"/>
-
-        <label>Customer Story Link 3 Label</label>
-        <input id="link3_label" name="link3_label" type="text"/>
-        <label>Customer Story Link 3 URL</label>
-        <input id="link3_url" name="link3_url" type="url"/>
-
-        <label for="useCaseTags">Tags (comma separated)</label>
-        <input id="useCaseTags" name="tags"/>
-
-        <button class="btn" type="submit">Submit</button>
-      </form>
+  <div class="container">
+    <div class="use-case-list" id="useCaseList">
+      <!-- Use case list renders here (future) -->
+      <div style="color:#666; text-align:center; font-size:1.1rem;">
+        (No use cases yet)
+      </div>
     </div>
   </div>
-
-  <!-- Add Tag Modal -->
-  <div class="modal" id="addTagModal">
-    <div class="modal-content">
-      <button class="close" id="closeTagModalBtn">&times;</button>
-      <h2>Add New Tag</h2>
-      <form id="tagForm" autocomplete="off">
-        <label for="tagName">Tag Name</label>
-        <input id="tagName" name="tag" required />
-        <button class="btn" type="submit">Add Tag</button>
-      </form>
+  <!-- Modal (placeholder, hidden) -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <button class="close" title="Close">&times;</button>
+      <div id="modalContent"></div>
     </div>
   </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+<script>
+// ------------ SUPABASE CONFIG -----------
+const SUPABASE_URL = "https://cgsfmpkcewemokbegnnt.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2ZtcGtjZXdlbW9rYmVnbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MzMyNzIsImV4cCI6MjA2OTQwOTI3Mn0.-5paJnbUuFWoIRSVAYcx3LRPYH5_HRjwjYcupvRKYLc";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <script>
-    // Supabase config
-    const SUPABASE_URL = 'https://cgsfmpkcewemokbegnnt.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2ZtcGtjZXdlbW9rYmVnbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MzMyNzIsImV4cCI6MjA2OTQwOTI3Mn0.-5paJnbUuFWoIRSVAYcx3LRPYH5_HRjwjYcupvRKYLc';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ------------ STATE -------------
+let useCases = [];
+let tags = [];
+let tagToId = {}; // tag text => tag id (if using a tags table)
+let selectedTag = "";
 
-    // Modal logic
-    function modalHandler(modalId, openBtnId, closeBtnId) {
-      const modal = document.getElementById(modalId);
-      if (openBtnId) document.getElementById(openBtnId).onclick = () => modal.classList.add('active');
-      document.getElementById(closeBtnId).onclick = () => modal.classList.remove('active');
-      modal.onclick = e => { if (e.target === modal) modal.classList.remove('active'); };
-    }
-    modalHandler('addUseCaseModal', 'addUseCaseBtn', 'closeModalBtn');
-    modalHandler('addTagModal', 'addTagBtn', 'closeTagModalBtn');
+// ------------ UTILITIES ----------
+function $(sel) { return document.querySelector(sel); }
+function escapeHTML(str) { return (str+'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function clearChildren(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
-    // Use Cases Display Logic
-    const useCaseList = document.getElementById('useCaseList');
-    async function loadUseCases(filterTag) {
-      useCaseList.innerHTML = "<p>Loading use cases…</p>";
-      let q = supabase.from('use_cases').select('*').order('created_at', {ascending: false});
-      if (filterTag) q = q.contains('tags', [filterTag]);
-      let { data, error } = await q;
-      if (error) {
-        useCaseList.innerHTML = "<p style='color:crimson'>Failed to load use cases.</p>";
-        return;
-      }
-      if (!data || data.length === 0) {
-        useCaseList.innerHTML = `<p>No use cases${filterTag ? ` for tag "${filterTag}"` : ""}. Be first to add one!</p>`;
-        return;
-      }
-      useCaseList.innerHTML = data.map(uc => `
-        <div class="use-case-row">
-          <div class="use-case-title">${uc.title}</div>
-          <div class="tags">${uc.tags && uc.tags.length ? uc.tags.map(t=>`<span class="tag">${t}</span>`).join("") : ""}</div>
-          <details>
-            <summary>Show Details</summary>
-            <div class="details-body">
-              <div style="margin-bottom:8px;"><strong>Description:</strong><br>${uc.description || ""}</div>
-              <div class="embed-arch">
-                <strong>Architecture:</strong>
-                <div>${uc.embed_url ? uc.embed_url : "<em>None</em>"}</div>
-              </div>
-              <div class="story-links">
-                <strong>Customer Stories:</strong>
-                <ul>
-                  ${uc.link1_url ? `<li><a href="${uc.link1_url}" target="_blank">${uc.link1_label||uc.link1_url}</a></li>` : ""}
-                  ${uc.link2_url ? `<li><a href="${uc.link2_url}" target="_blank">${uc.link2_label||uc.link2_url}</a></li>` : ""}
-                  ${uc.link3_url ? `<li><a href="${uc.link3_url}" target="_blank">${uc.link3_label||uc.link3_url}</a></li>` : ""}
-                </ul>
-              </div>
-              <div class="created-at">Created: ${new Date(uc.created_at).toLocaleString()}</div>
-            </div>
-          </details>
-        </div>
-      `).join("");
-    }
-    loadUseCases();
+// ------------ RENDERING ----------
+function renderUseCaseList() {
+  const ucList = $('#useCaseList');
+  clearChildren(ucList);
+  let filter = selectedTag;
+  let filtered = useCases.filter(uc => !filter || (uc.tags && uc.tags.includes(filter)));
+  if (filtered.length === 0) {
+    ucList.innerHTML = `<div style="color:#666; text-align:center; font-size:1.1rem;">
+      (No use cases${filter ? ' for this tag' : ''} yet)
+    </div>`;
+    return;
+  }
+  filtered.forEach((uc, idx) => {
+    let row = document.createElement('div');
+    row.className = 'use-case-row';
+    row.tabIndex = 0;
+    row.innerHTML = `
+      <span>${escapeHTML(uc.title)}</span>
+      <span style="float:right; font-size:0.92rem; color:#147cbc; font-weight:600;">
+        ${uc.tags ? uc.tags.map(t=>`<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('') : ''}
+      </span>
+    `;
+    row.addEventListener('click', () => toggleUseCaseDetails(idx, row));
+    ucList.appendChild(row);
+    let details = document.createElement('div');
+    details.style.display = 'none';
+    details.style.background = '#f7fbfd';
+    details.style.borderRadius = '10px';
+    details.style.margin = '10px 0 14px 0';
+    details.style.padding = '12px 18px 15px 18px';
+    details.style.boxShadow = '0 2px 10px #0001';
+    details.innerHTML = `
+      <div style="font-size:1.12rem; font-weight:600; margin-bottom:8px;">
+        ${escapeHTML(uc.title)}
+      </div>
+      <div style="margin-bottom:8px; color:#263;">
+        ${escapeHTML(uc.description || '')}
+      </div>
+      <div style="margin-bottom:8px;">${uc.embed_url || ''}</div>
+      <div>
+        ${[1,2,3].map(i => uc['link'+i+'_label'] && uc['link'+i+'_url'] ?
+          `<a href="${escapeHTML(uc['link'+i+'_url'])}" target="_blank" style="margin-right:15px; color:#147cbc; text-decoration:underline;">${escapeHTML(uc['link'+i+'_label'])}</a>` : '').join('')}
+      </div>
+      <div style="margin:14px 0 6px 0;">
+        <label style="font-weight:500;">Tags: </label>
+        ${uc.tags ? uc.tags.map(t=>`<span style="background:#eaf4fa; border-radius:7px; margin-left:0.18rem; padding:2px 8px;">${escapeHTML(t)}</span>`).join('') : ''}
+        <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
+      </div>
+    `;
+    row.after(details);
+    row.detailsNode = details;
+  });
+}
+function toggleUseCaseDetails(idx, row) {
+  let details = row.detailsNode;
+  details.style.display = (details.style.display === 'none') ? 'block' : 'none';
+}
+function renderTagDropdown() {
+  let sel = $('#tagFilter');
+  clearChildren(sel);
+  let opt = document.createElement('option');
+  opt.value = '';
+  opt.textContent = 'Filter by tag...';
+  sel.appendChild(opt);
+  tags.forEach(t => {
+    let o = document.createElement('option');
+    o.value = t;
+    o.textContent = t;
+    sel.appendChild(o);
+  });
+  sel.value = selectedTag;
+}
 
-    // Add Use Case Form logic
-    document.getElementById('useCaseForm').onsubmit = async e => {
-      e.preventDefault();
-      // Collect data
-      const title = document.getElementById('useCaseTitle').value.trim();
-      const description = document.getElementById('useCaseDesc').value.trim();
-      const embed_url = document.getElementById('useCaseEmbed').value.trim();
-      const link1_label = document.getElementById('link1_label').value.trim();
-      const link1_url = document.getElementById('link1_url').value.trim();
-      const link2_label = document.getElementById('link2_label').value.trim();
-      const link2_url = document.getElementById('link2_url').value.trim();
-      const link3_label = document.getElementById('link3_label').value.trim();
-      const link3_url = document.getElementById('link3_url').value.trim();
-      const tags = document.getElementById('useCaseTags').value.split(',').map(s=>s.trim()).filter(Boolean);
+// ------------- SUPABASE CRUD --------------
 
-      // Insert into Supabase
-      const { error } = await supabase.from('use_cases').insert([{
-        title, description, embed_url, link1_label, link1_url,
-        link2_label, link2_url, link3_label, link3_url, tags
-      }]);
-      if (error) {
-        alert("Failed to add use case: "+error.message);
-      } else {
-        document.getElementById('addUseCaseModal').classList.remove('active');
-        loadUseCases();
-      }
-      e.target.reset();
-    }
+// Load all tags and use cases (one call each)
+async function fetchTagsAndUseCases() {
+  // If you have a tags table, use this section
+  // let { data: tagRows, error: tagErr } = await supabase.from('tags').select('*');
+  // tags = tagRows ? tagRows.map(row => row.tag) : [];
 
-    // Tag filter logic (from all use cases)
-    async function populateTagFilter() {
-      let { data } = await supabase.from('use_cases').select('tags');
-      const tags = new Set();
-      (data||[]).forEach(uc=>{
-        if(Array.isArray(uc.tags)) uc.tags.forEach(t=>tags.add(t));
-      });
-      const sel = document.getElementById('tagFilter');
-      sel.innerHTML = '<option value="">Filter by tag...</option>' +
-        Array.from(tags).sort().map(t=>`<option value="${t}">${t}</option>`).join("");
-    }
-    populateTagFilter();
+  // If not, derive tags from all use_cases' tags arrays
+  let { data, error } = await supabase.from('use_cases').select('tags');
+  tags = [];
+  if (data) {
+    let tagSet = new Set();
+    data.forEach(uc => (uc.tags||[]).forEach(tag => tagSet.add(tag)));
+    tags = Array.from(tagSet).sort();
+  }
 
-    // Reload on filter
-    document.getElementById('tagFilter').onchange = function() {
-      loadUseCases(this.value);
-    }
+  // Now fetch all use cases
+  let { data: ucRows, error: ucErr } = await supabase.from('use_cases').select('*').order('created_at', { ascending: false });
+  useCases = ucRows || [];
+  renderTagDropdown();
+  renderUseCaseList();
+}
+fetchTagsAndUseCases();
 
-    // Add Tag Modal (for now: only UI, as tags are not in separate table)
-    document.getElementById('tagForm').onsubmit = async function(e) {
-      e.preventDefault();
-      // For demo, just add to tag filter for now
-      let tag = document.getElementById('tagName').value.trim();
-      if (tag) {
-        let sel = document.getElementById('tagFilter');
-        let exists = Array.from(sel.options).some(o=>o.value===tag);
-        if (!exists) {
-          sel.innerHTML += `<option value="${tag}">${tag}</option>`;
-          alert('Tag "'+tag+'" added (UI only; attach to use cases via the form)');
-        }
-      }
-      document.getElementById('addTagModal').classList.remove('active');
-      e.target.reset();
+// ------------- FORM POPUPS -------------
+function showModal(html, onClose) {
+  const modal = $('#modalOverlay');
+  $('#modalContent').innerHTML = html;
+  modal.style.display = 'flex';
+  modal.onclick = function(e) {
+    if (e.target === modal) { modal.style.display = 'none'; if (onClose) onClose(); }
+  };
+  modal.querySelector('.close').onclick = function() {
+    modal.style.display = 'none';
+    if (onClose) onClose();
+  };
+}
+$('#addUseCaseBtn').onclick = function() {
+  showModal(renderAddUseCaseForm(), null);
+};
+$('#addTagBtn').onclick = function() {
+  showModal(renderAddTagForm(), null);
+};
+$('#tagFilter').onchange = function() {
+  selectedTag = this.value;
+  renderUseCaseList();
+};
+
+// ------------- TAG TO USE CASE -------------
+function showAddTagToUseCase(useCaseId) {
+  showModal(renderAddTagToUseCaseForm(useCaseId), null);
+}
+function renderAddTagToUseCaseForm(useCaseId) {
+  let tagOpts = tags.map(t=>`<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`).join('');
+  return `
+    <div style="font-size:1.2rem; font-weight:600; margin-bottom:10px;">Add Tag to Use Case</div>
+    <form id="addTagToUCForm" data-ucid="${escapeHTML(useCaseId)}">
+      <label>Select tag:</label>
+      <select name="tag" style="width:100%; margin-bottom:8px; font-size:1.01rem; padding:6px;">
+        <option value="">Choose existing tag...</option>
+        ${tagOpts}
+      </select>
+      <label>Or new tag:</label>
+      <input type="text" name="newtag" placeholder="New tag (optional)" style="width:100%; margin-bottom:9px; font-size:1rem; padding:6px;">
+      <button class="btn" type="submit" style="width:100%; margin-top:6px;">Add Tag</button>
+    </form>
+  `;
+}
+
+// ------------- FORMS (REUSE FROM PREV) -------------
+function renderAddUseCaseForm() {
+  return `
+    <div style="font-size:1.3rem; font-weight:600; margin-bottom:10px;">Add Use Case</div>
+    <form id="useCaseForm" autocomplete="off">
+      <input type="text" name="title" required placeholder="Title" style="width:100%; margin-bottom:9px; font-size:1.1rem; padding:8px;">
+      <textarea name="description" rows="2" placeholder="Description (optional)" style="width:100%; margin-bottom:9px; font-size:1rem; padding:8px;"></textarea>
+      <textarea name="embed_url" rows="2" placeholder="Architecture Embed Code (iframe allowed)" style="width:100%; margin-bottom:9px; font-size:1rem; padding:8px;"></textarea>
+      <div style="display:flex; gap:6px; margin-bottom:7px;">
+        <input type="text" name="link1_label" placeholder="Customer Story 1 Label" style="flex:1; padding:7px;">
+        <input type="text" name="link1_url" placeholder="Customer Story 1 URL" style="flex:2; padding:7px;">
+      </div>
+      <div style="display:flex; gap:6px; margin-bottom:7px;">
+        <input type="text" name="link2_label" placeholder="Customer Story 2 Label" style="flex:1; padding:7px;">
+        <input type="text" name="link2_url" placeholder="Customer Story 2 URL" style="flex:2; padding:7px;">
+      </div>
+      <div style="display:flex; gap:6px; margin-bottom:7px;">
+        <input type="text" name="link3_label" placeholder="Customer Story 3 Label" style="flex:1; padding:7px;">
+        <input type="text" name="link3_url" placeholder="Customer Story 3 URL" style="flex:2; padding:7px;">
+      </div>
+      <input type="text" name="tags" placeholder="Tags (comma separated)" style="width:100%; margin-bottom:9px; font-size:1rem; padding:7px;">
+      <button class="btn" type="submit" style="width:100%; margin-top:10px; font-size:1.05rem;">Submit</button>
+    </form>
+  `;
+}
+function renderAddTagForm() {
+  return `
+    <div style="font-size:1.2rem; font-weight:600; margin-bottom:10px;">Add Tag</div>
+    <form id="tagForm">
+      <input type="text" name="tag" required placeholder="New tag name" style="width:100%; margin-bottom:12px; font-size:1.03rem; padding:7px;">
+      <button class="btn" type="submit" style="width:100%; font-size:1.01rem;">Add</button>
+    </form>
+  `;
+}
+
+// ------------- FORM SUBMISSION + API -------------
+document.addEventListener('submit', async function(e) {
+  // Add Use Case
+  if (e.target && e.target.id === 'useCaseForm') {
+    e.preventDefault();
+    let fd = new FormData(e.target);
+    let tagsArr = (fd.get('tags') || '').split(',').map(t=>t.trim()).filter(Boolean);
+    let insertObj = {
+      title: fd.get('title'),
+      description: fd.get('description'),
+      embed_url: fd.get('embed_url'),
+      link1_label: fd.get('link1_label'),
+      link1_url: fd.get('link1_url'),
+      link2_label: fd.get('link2_label'),
+      link2_url: fd.get('link2_url'),
+      link3_label: fd.get('link3_label'),
+      link3_url: fd.get('link3_url'),
+      tags: tagsArr,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
-  </script>
+    let { data, error } = await supabase.from('use_cases').insert([insertObj]);
+    if (error) alert("Error adding use case: " + error.message);
+    $('#modalOverlay').style.display = 'none';
+    await fetchTagsAndUseCases();
+    return;
+  }
+  // Add Tag
+  if (e.target && e.target.id === 'tagForm') {
+    e.preventDefault();
+    let tag = e.target.tag.value.trim();
+    if (tag && !tags.includes(tag)) {
+      tags.push(tag);
+      // If you have a tags table, uncomment the next two lines
+      // await supabase.from('tags').insert([{tag}]);
+      renderTagDropdown();
+      renderUseCaseList();
+    }
+    $('#modalOverlay').style.display = 'none';
+    return;
+  }
+  // Add Tag to Use Case
+  if (e.target && e.target.id === 'addTagToUCForm') {
+    e.preventDefault();
+    let ucId = e.target.getAttribute("data-ucid");
+    let selectedTag = e.target.tag.value.trim();
+    let newTag = e.target.newtag.value.trim();
+    let uc = useCases.find(u => u.id === ucId);
+    if (!uc) return;
+    let newTags = uc.tags ? [...uc.tags] : [];
+    if (selectedTag && !newTags.includes(selectedTag)) newTags.push(selectedTag);
+    if (newTag && !tags.includes(newTag)) {
+      tags.push(newTag);
+      newTags.push(newTag);
+      // If you have a tags table, uncomment the next two lines
+      // await supabase.from('tags').insert([{tag:newTag}]);
+      renderTagDropdown();
+    }
+    // Update the use_case in DB
+    await supabase.from('use_cases').update({ tags: newTags, updated_at: new Date().toISOString() }).eq('id', ucId);
+    $('#modalOverlay').style.display = 'none';
+    await fetchTagsAndUseCases();
+    return;
+  }
+});
+</script>
 </body>
 </html>
