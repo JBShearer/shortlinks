@@ -251,6 +251,7 @@ function toggleUseCaseDetails(idx, row) {
   details.style.display = (details.style.display === 'none') ? 'block' : 'none';
 }
 function renderTagDropdown() {
+  console.log("📌 renderTagDropdown called. Current tags:", tags);
   let sel = $('#tagFilter');
   clearChildren(sel);
 
@@ -295,7 +296,7 @@ tagScan.forEach(uc => {
   });
 });
 tags = Array.from(tagSet).sort();
-
+console.log("✅ Final tag list from Supabase:", tags);
   // ✅ THIS LINE IS CRITICAL – adds definition of ucRows
   let { data: ucRows, error: ucErr } = await supabase
     .from('use_cases')
