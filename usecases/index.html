@@ -275,18 +275,6 @@ async function fetchTagsAndUseCases() {
   renderTagDropdown();
   renderUseCaseList();
 }
-
-// Now fetch all use cases
-async function fetchTagsAndUseCases() {
-  // --- Fetch tags from all use cases
-  let { data: tagScan, error: tagErr } = await supabase.from('use_cases').select('tags');
-  tags = [];
-  if (tagScan) {
-    let tagSet = new Set();
-    tagScan.forEach(uc => (uc.tags || []).forEach(tag => tagSet.add(tag)));
-    tags = Array.from(tagSet).sort();
-  }
-
   // ✅ Add this missing Supabase query to define ucRows
   let { data: ucRows, error: ucErr } = await supabase
     .from('use_cases')
