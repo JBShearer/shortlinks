@@ -269,15 +269,18 @@ details.innerHTML = `
   <div style="margin-bottom:10px;">
     ${escapeHTML(uc.description || '')}
   </div>
+    <div style="margin-bottom:14px;">
+    <div style="font-weight:500; margin-bottom:6px;">Customer Use Cases:</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+      ${linkButtonsHTML}
+    </div>
+  </div>
   <div style="margin-bottom:10px;">
     <label style="font-weight:500;">Tags:</label>
     ${uc.tags && uc.tags.length > 0
       ? uc.tags.map(t => `<span style="background:#eaf4fa; border-radius:7px; margin-left:0.23rem; padding:1px 9px;">${escapeHTML(t)}</span>`).join('')
       : '<span style="color:#aaa; font-style:italic;">(no tags)</span>'}
     <button class="btn" style="margin-left:8px; font-size:0.9rem; padding:3px 11px;" onclick="event.stopPropagation(); showAddTagToUseCase('${uc.id}');">+ Tag</button>
-  </div>
-  <div style="margin-bottom:12px;">
-    ${linkButtonsHTML}
   </div>
   ${uc.embed_url ? `<div class="responsive-embed-wrapper">${uc.embed_url}</div>` : ''}
 `;
