@@ -248,17 +248,32 @@ function renderTagDropdown() {
 
 // Load all tags and use cases (one call each)
 async function fetchTagsAndUseCases() {
-  // If you have a tags table, use this section
-  // let { data: tagRows, error: tagErr } = await supabase.from('tags').select('*');
-  // tags = tagRows ? tagRows.map(row => row.tag) : [];
-
-  // If not, derive tags from all use_cases' tags arrays
+  // Fetch tags from use_cases table
   let { data: tagScan, error: tagErr } = await supabase.from('use_cases').select('tags');
-tags = [];
-if (tagScan) {
-  let tagSet = new Set();
-  tagScan.forEach(uc => (uc.tags || []).forEach(tag => tagSet.add(tag)));
-  tags = Array.from(tagSet).sort();
+  tags = [];
+  if (tagScan) {
+    let tagSet = new Set();
+    tagScan.forEach(uc => (uc.tags || []).forEach(tag => tagSet.add(tag)));
+    tags = Array.from(tagSet).sort();
+  }
+
+  // ✅ THIS LINE IS CRITICAL – adds definition of ucRows
+  let { data: ucRows, error: ucErr } = await supabase
+    .from('use_cases')
+    .select('*')
+    .order('created_at', { ascending: false, nullsLast: true });
+
+  if (ucErr) {
+    console.error("Error fetching use_cases:", ucErr);
+    return;
+  }
+
+  useCases = ucRows || [];
+  window.useCases = useCases;
+  console.log("useCases loaded:", useCases);
+
+  renderTagDropdown();
+  renderUseCaseList();
 }
 
 // Now fetch all use cases
