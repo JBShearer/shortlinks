@@ -148,27 +148,23 @@
 <body>
   <div class="navbar">
     <span class="navbar-title">Use Case List</span>
-   <div class="navbar-controls" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-  <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
-    <label for="tagFilter" style="font-weight: 500; color: #ddd;">Filter:</label>
-    <select class="filter-select" id="tagFilter">
-      <option value="">Filter by tag...</option>
-    </select>
+<div class="navbar-controls" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem;">
+  <label for="tagFilter" style="font-size: 1rem; color: #ccc;">Filter:</label>
+  <select class="filter-select" id="tagFilter" style="font-size: 1rem; height: 36px;">
+    <option value="">Filter by tag...</option>
+  </select>
 
-    <label for="sortSelect" style="font-weight: 500; color: #ddd;">Sort:</label>
-    <select class="filter-select" id="sortSelect">
-      <option value="created_desc">Sort: Newest</option>
-      <option value="created_asc">Sort: Oldest</option>
-      <option value="az">Sort: A → Z</option>
-      <option value="za">Sort: Z → A</option>
-      <option value="tagcount">Sort: Most Tags</option>
-    </select>
-  </div>
+  <label for="sortSelect" style="font-size: 1rem; color: #ccc;">Sort:</label>
+  <select class="filter-select" id="sortSelect" style="font-size: 1rem; height: 36px;">
+    <option value="created_desc">Sort: Newest</option>
+    <option value="created_asc">Sort: Oldest</option>
+    <option value="az">Sort: A → Z</option>
+    <option value="za">Sort: Z → A</option>
+    <option value="tagcount">Sort: Most Tags</option>
+  </select>
 
-  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-    <button class="btn" id="addTagBtn">+ Add Tag</button>
-    <button class="btn" id="addUseCaseBtn">Add Use Case</button>
-  </div>
+  <button class="btn" id="addTagBtn" style="padding: 0.4rem 0.9rem; font-size: 0.95rem;">+ Add Tag</button>
+  <button class="btn" id="addUseCaseBtn" style="padding: 0.4rem 0.9rem; font-size: 0.95rem;">Add Use Case</button>
 </div>
   </div>
   <div class="container">
@@ -293,7 +289,7 @@ row.innerHTML = `
 const linkButtonsHTML = [1,2,3].map(i =>
   uc['link'+i+'_label'] && uc['link'+i+'_url'] ?
     `<a href="${escapeHTML(uc['link'+i+'_url'])}" target="_blank"
-      style="display:inline-flex; align-items:center; gap:6px; margin-right:10px; background:#003366; color:#fff; padding:6px 10px; border-radius:6px; font-size:0.92rem; text-decoration:none;">
+      style="display:inline-flex; align-items:center; gap:6px; margin-right:10px; background:#003366; color:#fff; padding:4px 8px; border-radius:6px; font-size:0.9rem; text-decoration:none; white-space:nowrap;"
       📄 ${escapeHTML(uc['link'+i+'_label'])}
     </a>` : ''
 ).join('');
