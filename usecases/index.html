@@ -286,12 +286,13 @@ row.innerHTML = `
     details.style.margin = '10px 0 14px 0';
     details.style.padding = '12px 18px 15px 18px';
     details.style.boxShadow = '0 2px 10px #0001';
-const linkButtonsHTML = [1,2,3].map(i =>
-  uc['link'+i+'_label'] && uc['link'+i+'_url'] ?
-    `<a href="${escapeHTML(uc['link'+i+'_url'])}" target="_blank"
-      style="display:inline-flex; align-items:center; gap:6px; margin-right:10px; background:#003366; color:#fff; padding:4px 8px; border-radius:6px; font-size:0.9rem; text-decoration:none; white-space:nowrap;"
-      📄 ${escapeHTML(uc['link'+i+'_label'])}
-    </a>` : ''
+const linkButtonsHTML = [1,2,3].filter(i =>
+  uc[`link${i}_label`] && uc[`link${i}_url`]
+).map(i =>
+  `<a href="${escapeHTML(uc[`link${i}_url`])}" target="_blank"
+    style="display:inline-block; background:#003366; color:#fff; padding:4px 10px; border-radius:6px; font-size:0.9rem; text-decoration:none; white-space:nowrap; line-height:1.2;">
+    📄 ${escapeHTML(uc[`link${i}_label`])}
+  </a>`
 ).join('');
 
 details.innerHTML = `
