@@ -290,7 +290,19 @@ const linkButtonsHTML = [1,2,3].filter(i =>
   uc[`link${i}_label`] && uc[`link${i}_url`]
 ).map(i =>
   `<a href="${escapeHTML(uc[`link${i}_url`])}" target="_blank"
-    style="display:inline-block; background:#003366; color:#fff; padding:4px 10px; border-radius:6px; font-size:0.9rem; text-decoration:none; white-space:nowrap; line-height:1.2;">
+    style="
+      display: inline-block;
+      background: #003366;
+      color: #fff;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      white-space: nowrap;
+      line-height: 1.2;
+      max-width: fit-content;
+    ">
     📄 ${escapeHTML(uc[`link${i}_label`])}
   </a>`
 ).join('');
