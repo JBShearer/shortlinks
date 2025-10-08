@@ -1,0 +1,11 @@
+{
+  "name": "zelda-style-game",
+  "version": "1.0.0",
+  "description": "A Zelda-style top-down game skeleton as a static ES-module web app.",
+  "main": "index.html",
+  "scripts": {
+    "serve": "npx live-server --port=8080"
+  },
+  "author": "",
+  "license": "ISC"
+}
