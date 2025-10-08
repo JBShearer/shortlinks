@@ -1,3 +1,5 @@
+import assets from './assets.js';
+
 // Initialize the canvas and context
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -53,8 +55,17 @@ function isColliding(x, y) {
 
 // Draw game elements
 function draw() {
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.size, player.size);
+    // Draw player
+    ctx.drawImage(assets.playerImage, player.x, player.y, player.size, player.size);
+
+    // Draw living room
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            if (map[row][col] === 1) {
+                ctx.drawImage(assets.tileImage, col * tileSize, row * tileSize, tileSize, tileSize);
+            }
+        }
+    }
 }
 
 // Event listeners for keyboard input
